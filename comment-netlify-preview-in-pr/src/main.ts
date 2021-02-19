@@ -27,17 +27,17 @@ async function run(): Promise<void> {
     const octokit = github.getOctokit(inputs.token)
     const event = JSON.parse(fs.readFileSync(eventPath, 'utf-8'))
     const pullRequests = event.workflow_run.pull_requests
-    let prNumber: number | undefined
+    let foundPR = false
     let pull_request
     for (let pr of pullRequests) {
       if (pr.head.sha === event.workflow_run.head_commit.id) {
-        prNumber = pr.number
+        foundPR = true
         pull_request = pr
         break
       }
     }
 
-    if (prNumber === undefined) {
+    if (foundPR === false) {
       core.info(
         `No pull request associated with git commit SHA: ${event.workflow_run.head_commit.id}`
       )
@@ -49,7 +49,7 @@ async function run(): Promise<void> {
     await octokit.issues.createComment({
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
-      issue_number: prNumber,
+      issue_number: pull_request.number,
       body: message,
     })
   } catch (error) {

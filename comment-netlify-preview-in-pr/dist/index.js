@@ -68,17 +68,17 @@ function run() {
                     prNumber = pr.number;
                     break;
                 }
-                if (prNumber === undefined) {
-                    core.info(`No pull request associated with git commit SHA: ${event.workflow_run.head_commit.id}`);
-                    process.exit(0);
-                }
-                yield octokit.issues.createComment({
-                    owner: github.context.repo.owner,
-                    repo: github.context.repo.repo,
-                    issue_number: prNumber,
-                    body: inputs.deployUrl,
-                });
             }
+            if (prNumber === undefined) {
+                core.info(`No pull request associated with git commit SHA: ${event.workflow_run.head_commit.id}`);
+                process.exit(0);
+            }
+            yield octokit.issues.createComment({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                issue_number: prNumber,
+                body: inputs.deployUrl,
+            });
         }
         catch (error) {
             core.info(error.message);

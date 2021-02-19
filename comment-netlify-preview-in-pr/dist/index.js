@@ -49,7 +49,6 @@ function parseInputs() {
             return inputs;
         }
         catch (error) {
-            core.info(error.message);
             throw error;
         }
     });
@@ -64,13 +63,18 @@ function run() {
             yield core.group('Event payload...', () => __awaiter(this, void 0, void 0, function* () {
                 core.info(JSON.stringify(event));
             }));
-            const pullRequests = event.workflow_run.pull_requests;
             let foundPR = false;
-            let pull_request;
-            for (let pr of pullRequests) {
+            let pullRequestNumber = undefined;
+            let pullRequestHeadSHA = undefined;
+            const pullRequests = yield octokit.pulls.list({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+            });
+            for (let pr of pullRequests.data) {
                 if (pr.head.sha === event.workflow_run.head_commit.id) {
                     foundPR = true;
-                    pull_request = pr;
+                    pullRequestHeadSHA = pr.head.sha;
+                    pullRequestNumber = pr.number;
                     break;
                 }
             }
@@ -78,13 +82,15 @@ function run() {
                 core.info(`No pull request associated with git commit SHA: ${event.workflow_run.head_commit.id}`);
                 process.exit(0);
             }
-            const message = `🚀 📚 Preview for git commit SHA: ${pull_request.head.sha} at: ${inputs.deployUrl}`;
-            yield octokit.issues.createComment({
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                issue_number: pull_request.number,
-                body: message,
-            });
+            const message = `🚀 📚 Preview for git commit SHA: ${pullRequestHeadSHA} at: ${inputs.deployUrl}`;
+            if (typeof pullRequestNumber === 'number') {
+                yield octokit.issues.createComment({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    issue_number: pullRequestNumber,
+                    body: message,
+                });
+            }
         }
         catch (error) {
             core.info('Unable to post comment.');

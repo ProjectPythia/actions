@@ -1,7 +1,6 @@
 import * as github from '@actions/github'
 import * as core from '@actions/core'
 import * as fs from 'fs'
-
 interface IActionInputs {
   readonly deployUrl: string
   readonly token: string
@@ -15,7 +14,6 @@ async function parseInputs(): Promise<IActionInputs> {
     })
     return inputs
   } catch (error) {
-    core.info(error.message)
     throw error
   }
 }
@@ -30,13 +28,20 @@ async function run(): Promise<void> {
     await core.group('Event payload...', async () => {
       core.info(JSON.stringify(event))
     })
-    const pullRequests = event.workflow_run.pull_requests
+
     let foundPR = false
-    let pull_request
-    for (let pr of pullRequests) {
+    let pullRequestNumber: number | undefined = undefined
+    let pullRequestHeadSHA: string | undefined = undefined
+    const pullRequests = await octokit.pulls.list({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+    })
+
+    for (let pr of pullRequests.data) {
       if (pr.head.sha === event.workflow_run.head_commit.id) {
         foundPR = true
-        pull_request = pr
+        pullRequestHeadSHA = pr.head.sha
+        pullRequestNumber = pr.number
         break
       }
     }
@@ -48,14 +53,16 @@ async function run(): Promise<void> {
       process.exit(0)
     }
 
-    const message = `🚀 📚 Preview for git commit SHA: ${pull_request.head.sha} at: ${inputs.deployUrl}`
+    const message = `🚀 📚 Preview for git commit SHA: ${pullRequestHeadSHA} at: ${inputs.deployUrl}`
 
-    await octokit.issues.createComment({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      issue_number: pull_request.number,
-      body: message,
-    })
+    if (typeof pullRequestNumber === 'number') {
+      await octokit.issues.createComment({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        issue_number: pullRequestNumber,
+        body: message,
+      })
+    }
   } catch (error) {
     core.info('Unable to post comment.')
     throw error

@@ -1,0 +1,13 @@
+name: Comment Netlify Preview in PR
+description: Comment with the netlify URL preview in the PR
+author: Anderson Banihirwe
+inputs:
+  token:
+    description: Token for the repo. Can be passed in using {{ secrets.GITHUB_TOKEN }}
+    required: true
+  deploy-url:
+    description: The deployment URL to comment in the PR
+    required: true
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

@@ -26,6 +26,10 @@ async function run(): Promise<void> {
     const eventPath: string = process.env.GITHUB_EVENT_PATH as string
     const octokit = github.getOctokit(inputs.token)
     const event = JSON.parse(fs.readFileSync(eventPath, 'utf-8'))
+
+    await core.group('Event payload...', async () => {
+      core.info(event)
+    })
     const pullRequests = event.workflow_run.pull_requests
     let foundPR = false
     let pull_request

@@ -9,6 +9,9 @@ on: # rebuild any PRs and main branch changes
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./comment-netlify-preview-in-pr
     steps:
       - uses: actions/checkout@v2
       - run: |

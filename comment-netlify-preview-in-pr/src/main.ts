@@ -44,7 +44,7 @@ async function run(): Promise<void> {
       process.exit(0)
     }
 
-    const message = `📚 build preview for git commit SHA: ${pull_request.head.sha} at: ${inputs.deployUrl}`
+    const message = `🚀 📚 Preview for git commit SHA: ${pull_request.head.sha} at: ${inputs.deployUrl}`
 
     await octokit.issues.createComment({
       owner: github.context.repo.owner,

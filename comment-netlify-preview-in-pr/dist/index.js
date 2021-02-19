@@ -59,7 +59,25 @@ function run() {
             const inputs = yield core.group('Gathering inputs ...', parseInputs);
             const eventPath = process.env.GITHUB_EVENT_PATH;
             const octokit = github.getOctokit(inputs.token);
-            const event = fs.readFileSync(eventPath, 'utf-8');
+            const event = JSON.parse(fs.readFileSync(eventPath, 'utf-8'));
+            const pullRequests = event.workflow_run.pull_requests;
+            let prNumber;
+            for (let pr of pullRequests) {
+                if (pr.head.sha === event.workflow_run.head_commit.id) {
+                    prNumber = pr.number;
+                    break;
+                }
+                if (prNumber === undefined) {
+                    core.error(`No pull request associated with git commit SHA: ${event.workflow_run.head_commit.id}`);
+                    process.exit(0);
+                }
+                octokit.issues.createComment({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    issue_number: prNumber,
+                    body: inputs.deployUrl,
+                });
+            }
             core.info(event);
         }
         catch (error) {

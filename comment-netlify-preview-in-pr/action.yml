@@ -2,7 +2,7 @@ name: Comment Netlify Preview in PR
 description: Comment with the netlify URL preview in the PR
 author: Anderson Banihirwe
 inputs:
-  token:
+  github-token:
     description: Token for the repo. Can be passed in using {{ secrets.GITHUB_TOKEN }}
     required: true
   deploy-url:

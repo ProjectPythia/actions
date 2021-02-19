@@ -15,6 +15,7 @@ async function parseInputs(): Promise<IActionInputs> {
     })
     return inputs
   } catch (error) {
+    core.info(error.message)
     throw error
   }
 }
@@ -40,7 +41,7 @@ async function run(): Promise<void> {
         process.exit(0)
       }
 
-      octokit.issues.createComment({
+      await octokit.issues.createComment({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
         issue_number: prNumber,
@@ -48,6 +49,7 @@ async function run(): Promise<void> {
       })
     }
   } catch (error) {
+    core.info(error.message)
     core.setFailed(error.message)
   }
 }

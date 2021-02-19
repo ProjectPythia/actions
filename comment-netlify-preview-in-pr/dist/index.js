@@ -49,6 +49,7 @@ function parseInputs() {
             return inputs;
         }
         catch (error) {
+            core.info(error.message);
             throw error;
         }
     });
@@ -71,7 +72,7 @@ function run() {
                     core.info(`No pull request associated with git commit SHA: ${event.workflow_run.head_commit.id}`);
                     process.exit(0);
                 }
-                octokit.issues.createComment({
+                yield octokit.issues.createComment({
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
                     issue_number: prNumber,
@@ -80,6 +81,7 @@ function run() {
             }
         }
         catch (error) {
+            core.info(error.message);
             core.setFailed(error.message);
         }
     });

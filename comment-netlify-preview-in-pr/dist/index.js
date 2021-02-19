@@ -63,9 +63,11 @@ function run() {
             const event = JSON.parse(fs.readFileSync(eventPath, 'utf-8'));
             const pullRequests = event.workflow_run.pull_requests;
             let prNumber;
+            let pull_request;
             for (let pr of pullRequests) {
                 if (pr.head.sha === event.workflow_run.head_commit.id) {
                     prNumber = pr.number;
+                    pull_request = pr;
                     break;
                 }
             }
@@ -73,15 +75,16 @@ function run() {
                 core.info(`No pull request associated with git commit SHA: ${event.workflow_run.head_commit.id}`);
                 process.exit(0);
             }
+            const message = `📚 build preview for git commit SHA: ${pull_request.head.sha} at: ${inputs.deployUrl}`;
             yield octokit.issues.createComment({
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
                 issue_number: prNumber,
-                body: inputs.deployUrl,
+                body: message,
             });
         }
         catch (error) {
-            core.info(error.message);
+            core.info('Unable to post comment.');
             core.setFailed(error.message);
         }
     });

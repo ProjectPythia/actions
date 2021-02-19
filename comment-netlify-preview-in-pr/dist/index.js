@@ -38,6 +38,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const github = __importStar(__webpack_require__(438));
 const core = __importStar(__webpack_require__(186));
+const fs = __importStar(__webpack_require__(747));
 function parseInputs() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -56,7 +57,10 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const inputs = yield core.group('Gathering inputs ...', parseInputs);
+            const eventPath = process.env.GITHUB_EVENT_PATH;
             const octokit = github.getOctokit(inputs.token);
+            const event = fs.readFileSync(eventPath, 'utf-8');
+            core.info(event);
         }
         catch (error) {
             core.setFailed(error.message);

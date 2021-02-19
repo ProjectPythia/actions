@@ -28,7 +28,7 @@ async function run(): Promise<void> {
     const event = JSON.parse(fs.readFileSync(eventPath, 'utf-8'))
 
     await core.group('Event payload...', async () => {
-      core.info(event)
+      core.info(JSON.stringify(event))
     })
     const pullRequests = event.workflow_run.pull_requests
     let foundPR = false
@@ -58,7 +58,7 @@ async function run(): Promise<void> {
     })
   } catch (error) {
     core.info('Unable to post comment.')
-    core.setFailed(error.message)
+    throw error
   }
 }
 

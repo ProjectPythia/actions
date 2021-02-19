@@ -62,7 +62,7 @@ function run() {
             const octokit = github.getOctokit(inputs.token);
             const event = JSON.parse(fs.readFileSync(eventPath, 'utf-8'));
             yield core.group('Event payload...', () => __awaiter(this, void 0, void 0, function* () {
-                core.info(event);
+                core.info(JSON.stringify(event));
             }));
             const pullRequests = event.workflow_run.pull_requests;
             let foundPR = false;
@@ -88,7 +88,7 @@ function run() {
         }
         catch (error) {
             core.info('Unable to post comment.');
-            core.setFailed(error.message);
+            throw error;
         }
     });
 }

@@ -34,7 +34,7 @@ async function run(): Promise<void> {
       }
 
       if (prNumber === undefined) {
-        core.error(
+        core.info(
           `No pull request associated with git commit SHA: ${event.workflow_run.head_commit.id}`
         )
         process.exit(0)
@@ -47,7 +47,6 @@ async function run(): Promise<void> {
         body: inputs.deployUrl,
       })
     }
-    core.info(event)
   } catch (error) {
     core.setFailed(error.message)
   }

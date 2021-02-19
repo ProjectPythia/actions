@@ -68,7 +68,7 @@ function run() {
                     break;
                 }
                 if (prNumber === undefined) {
-                    core.error(`No pull request associated with git commit SHA: ${event.workflow_run.head_commit.id}`);
+                    core.info(`No pull request associated with git commit SHA: ${event.workflow_run.head_commit.id}`);
                     process.exit(0);
                 }
                 octokit.issues.createComment({
@@ -78,7 +78,6 @@ function run() {
                     body: inputs.deployUrl,
                 });
             }
-            core.info(event);
         }
         catch (error) {
             core.setFailed(error.message);

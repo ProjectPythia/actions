@@ -48,7 +48,7 @@ async function run(): Promise<void> {
 
     if (foundPR === false) {
       core.info(
-        `No pull request associated with git commit SHA: ${event.workflow_run.head_commit.id}`,
+        `No pull request associated with git commit SHA: ${event.workflow_run.head_commit.id}`
       )
       process.exit(0)
     }
